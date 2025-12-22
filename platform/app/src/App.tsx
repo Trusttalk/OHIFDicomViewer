@@ -46,7 +46,7 @@ let commandsManager: CommandsManager,
 function App({
   config = {
     /**
-     * Relative route from domain root that OHIF instance is installed at.
+     * Relative route from domain root that TrustTalk instance is installed at.
      * For example:
      *
      * Hosted at: https://ohif.org/where-i-host-the/viewer/

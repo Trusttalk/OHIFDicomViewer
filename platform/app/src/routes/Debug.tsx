@@ -11,7 +11,7 @@ function Debug() {
           <img
             className="mx-auto block h-14"
             src="./ohif-logo.svg"
-            alt="OHIF"
+            alt="TrustTalk"
           />
           <div className="space-y-2 pt-4 text-center">
             <div className="flex flex-col items-center justify-center">
