@@ -36,7 +36,7 @@ window.config = {
     },
   ],
 
-  // This tells OHIF to use the 'dicomjson' source by default
+  // This tells TTDV to use the 'dicomjson' source by default
   defaultDataSourceName: 'dicomjson',
 
   // 5. TrustTalk Custom Branding
@@ -59,7 +59,7 @@ window.config = {
           // Logo image
           React.createElement('img', {
             key: 'logo-img',
-            src: '/dv/trusttalk-logo.png', // Ensure this file exists in public/dv/
+            src: '/trusttalk-logo.png', // Ensure this file exists in public/dv/
             alt: 'TrustTalk',
             style: {
               height: '40px',
