@@ -47,6 +47,6 @@ window.config = {
   ],
   httpErrorHandler: error => {
     console.warn(error.status);
-    console.warn('test, navigate to https://ohif.org/');
+    console.warn('test, navigate to https://trusttalk.net/');
   },
 };

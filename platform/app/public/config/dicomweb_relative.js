@@ -54,7 +54,7 @@ window.config = {
     console.warn(error.status);
 
     // Could use services manager here to bring up a dialog/modal if needed.
-    console.warn('test, navigate to https://ohif.org/');
+    console.warn('test, navigate to https://trusttalk.net/');
   },
   hotkeys: [
     {

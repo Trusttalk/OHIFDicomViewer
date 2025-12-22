@@ -45,8 +45,8 @@ window.config = {
 //       console.warn(error.status);
 
 //       // Could use services manager here to bring up a dialog/modal if needed.
-//       console.warn('test, navigate to https://ohif.org/');
-//       window.location = 'https://ohif.org/';
+//       console.warn('test, navigate to https://trusttalk.net/');
+//       window.location = 'https://trusttalk.net/';
 //     },
 //     healthcareApiEndpoint: 'https://idc-sandbox-002.appspot.com/v1beta1',
 //   };
