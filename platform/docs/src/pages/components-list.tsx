@@ -131,7 +131,7 @@ export default function ComponentShowcase() {
   return (
     <Layout
       title="Components"
-      description="OHIF Viewer Components"
+      description="TrustTalk Viewer Components"
     >
       <div className="text-foreground min-h-screen bg-black">
         <div className="mx-auto my-4 max-w-5xl pt-6 pb-3">

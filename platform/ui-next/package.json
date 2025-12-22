@@ -1,7 +1,7 @@
 {
   "name": "@ohif/ui-next",
   "version": "3.9.0",
-  "description": "Next version of OHIF Viewers UI, more customizable using shadcn/ui",
+  "description": "Next version of TrustTalk Viewers UI, more customizable using shadcn/ui",
   "main": "dist/ohif-ui-next.umd.js",
   "module": "src/index.ts",
   "publishConfig": {
