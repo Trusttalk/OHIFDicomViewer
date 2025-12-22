@@ -81,7 +81,7 @@ const AboutModal = ({ buildNumber, versionNumber, commitHash }) => {
           href="https://community.ohif.org/"
           showIcon={true}
         >
-            {t('Visit the forum')}
+          {t('Visit the forum')}
         </Link>
         <span className="ml-4">
           <Link
@@ -93,10 +93,10 @@ const AboutModal = ({ buildNumber, versionNumber, commitHash }) => {
         </span>
         <span className="ml-4">
           <Link
-            href="https://ohif.org/"
+            href="https://trusttalk.net/"
             showIcon={true}
           >
-          {t('More details')}
+            {t('More details')}
           </Link>
         </span>
       </div>

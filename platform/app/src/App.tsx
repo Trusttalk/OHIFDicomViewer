@@ -49,7 +49,7 @@ function App({
      * Relative route from domain root that TrustTalk instance is installed at.
      * For example:
      *
-     * Hosted at: https://ohif.org/where-i-host-the/viewer/
+     * Hosted at: https://trusttalk.net/usecase/
      * Value: `/where-i-host-the/viewer/`
      * */
     routerBaseName: '/',

@@ -77,7 +77,7 @@ const InvestigationalUseDialog = ({
             <div className="text-[13px] text-white">
               <span
                 className="text-primary-active cursor-pointer"
-                onClick={() => window.open('https://ohif.org/', '_blank')}
+                onClick={() => window.open('https://trusttalk.net/', '_blank')}
               >
                 Learn more about TrustTalk Viewer
               </span>

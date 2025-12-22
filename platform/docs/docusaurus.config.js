@@ -138,7 +138,7 @@ module.exports = {
       announcementBar: {
         id: 'healthimaging',
         content:
-          '🎉 OHIF 3.8 has landed! Explore 4D and volume rendering, enhanced layout menus, streamlined visualization controls, workflow steps, and more. You can find the release notes by following this <a target="_blank" rel="noopener noreferrer" href="https://ohif.org/release-notes/3p8/">Link!</a> 🌟',
+          '🎉 OHIF 3.8 has landed! Explore 4D and volume rendering, enhanced layout menus, streamlined visualization controls, workflow steps, and more. You can find the release notes by following this <a target="_blank" rel="noopener noreferrer" href="https://trusttalk.net/release-notes/3p8/">Link!</a> 🌟',
       },
       prism: {
         theme: require('prism-react-renderer').themes.github,
@@ -170,13 +170,13 @@ module.exports = {
             position: 'left',
           },
           {
-            href: 'https://ohif.org/showcase',
+            href: 'https://trusttalk.net/usecase',
             label: 'Showcase',
             target: '_blank',
             position: 'left',
           },
           {
-            href: 'https://ohif.org/collaborate',
+            href: 'https://trusttalk.net/usecase',
             label: 'Collaborate',
             target: '_blank',
             position: 'left',
