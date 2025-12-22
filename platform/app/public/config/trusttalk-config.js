@@ -2,23 +2,23 @@
 
 window.config = {
   // 1. Core Deployment Settings
-  routerBasename: '/dv',
+  routerBasename: '/',
   showStudyList: false, // We launch directly via URL, so no study list needed.
 
   // 2. Extensions (CRITICAL for v3.9.0)
   // These provide the underlying functionality (DICOM parsing, Tools, etc.)
-  // extensions: [
-  //   '@ohif/extension-default',
-  //   '@ohif/extension-cornerstone',
-  //   '@ohif/extension-measurement-tracking',
-  //   '@ohif/extension-cornerstone-dicom-sr',
-  //   '@ohif/extension-dicom-pdf',
-  //   '@ohif/extension-dicom-video',
-  // ],
+  extensions: [
+    //   '@ohif/extension-default',
+    //   '@ohif/extension-cornerstone',
+    '@ohif/extension-measurement-tracking',
+    '@ohif/extension-cornerstone-dicom-sr',
+    '@ohif/extension-dicom-pdf',
+    '@ohif/extension-dicom-video',
+  ],
 
   // // 3. Modes (CRITICAL for v3.9.0)
   // // These define the actual Viewer Layout (Radiology, PET/CT, etc.)
-  // modes: ['@ohif/mode-longitudinal'],
+  modes: ['@ohif/mode-longitudinal'],
 
   // FIX: Leave these empty. The build system fills them automatically.
   // extensions: [],
