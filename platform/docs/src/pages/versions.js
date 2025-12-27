@@ -29,7 +29,7 @@ export default function Versions() {
   return (
     <Layout
       title="Versions"
-      description="OHIF Platform Versions"
+      description="TrustTalk Platform Versions"
     >
       <div className="margin-top--lg padding-horiz--lg container">
         <h1>Versions</h1>

@@ -1,7 +1,7 @@
 {
   "id": "ohif",
   "realm": "ohif",
-  "displayName": "OHIF",
+  "displayName": "TrustTalk",
   "displayNameHtml": "<div class=\"kc-logo-text\"><span>OHIF</span></div>",
   "notBefore": 0,
   "revokeRefreshToken": false,
@@ -1766,7 +1766,7 @@
     "_browser_header.strictTransportSecurity": "max-age=31536000; includeSubDomains",
     "permanentLockout": "false",
     "quickLoginCheckMilliSeconds": "1000",
-    "displayName": "OHIF",
+    "displayName": "TrustTalk",
     "_browser_header.xRobotsTag": "none",
     "maxFailureWaitSeconds": "900",
     "minimumQuickLoginWaitSeconds": "60",

@@ -313,7 +313,7 @@ function _showCPURenderingModal(uiModalService, hangingProtocolService) {
     if (progress === 100) {
       uiModalService.show({
         content: CPUModal,
-        title: 'OHIF Fell Back to CPU Rendering',
+        title: 'TrustTalk Fell Back to CPU Rendering',
       });
 
       return true;

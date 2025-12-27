@@ -85,7 +85,7 @@ const AboutModal = ({ buildNumber, versionNumber, commitHash }) => {
         </Link>
         <span className="ml-4">
           <Link
-            href="https://github.com/OHIF/Viewers/issues/new/choose"
+            href="https://github.com/TrustTalk/Viewers/issues/new/choose"
             showIcon={true}
           >
             {t('Report an issue')}
@@ -105,18 +105,18 @@ const AboutModal = ({ buildNumber, versionNumber, commitHash }) => {
       <div className="flex flex-col">
         <Row
           title={t('Repository URL')}
-          value="https://github.com/OHIF/Viewers/"
-          link="https://github.com/OHIF/Viewers/"
+          value="https://github.com/TrustTalk/Viewers/"
+          link="https://github.com/TrustTalk/Viewers/"
         />
         <Row
           title={t('Data citation')}
-          value="https://github.com/OHIF/Viewers/blob/master/DATACITATION.md"
-          link="https://github.com/OHIF/Viewers/blob/master/DATACITATION.md"
+          value="https://github.com/TrustTalk/Viewers/blob/master/DATACITATION.md"
+          link="https://github.com/TrustTalk/Viewers/blob/master/DATACITATION.md"
         />
         {/* <Row
           title={t('Last master commits')}
-          value="https://github.com/OHIF/Viewers/"
-          link="https://github.com/OHIF/Viewers/"
+          value="https://github.com/TrustTalk/Viewers/"
+          link="https://github.com/TrustTalk/Viewers/"
         /> */}
         <Row
           title={t('Version number')}
