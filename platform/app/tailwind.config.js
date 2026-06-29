@@ -52,5 +52,51 @@ module.exports = {
       '5xl': '3rem',
       '6xl': '4rem',
     },
+    extend: {
+      colors: {
+        primary: {
+          light: '#e1e1e1',
+          main: '#1c1c1c',
+          dark: '#050505',
+          active: '#333333',
+        },
+        inputfield: {
+          main: '#1a1a1a',
+          disabled: '#0a0a0a',
+          focus: '#e1e1e1',
+          placeholder: '#333333',
+        },
+        secondary: {
+          light: '#181818',
+          main: '#111111',
+          dark: '#080808',
+          active: '#222222',
+        },
+        indigo: {
+          dark: '#080808',
+        },
+        common: {
+          bright: '#e1e1e1',
+          light: '#a19fad',
+          main: '#fff',
+          dark: '#726f7e',
+          active: '#222222',
+        },
+        bkg: {
+          low: '#040404',
+          med: '#111111',
+          full: '#080808',
+        },
+        info: {
+          primary: '#FFFFFF',
+          secondary: '#a19fad',
+        },
+        actions: {
+          primary: '#FFFFFF',
+          highlight: '#e1e1e1',
+          hover: 'rgba(255, 255, 255, 0.1)',
+        },
+      },
+    },
   },
 };
