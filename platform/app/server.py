@@ -47,7 +47,7 @@ class SPAHandler(http.server.SimpleHTTPRequestHandler):
             # 3. DEBUG: Tell us what is happening for the JSON file
             if ".json" in clean_path:
                 exists = os.path.exists(file_path)
-                print(f"🔎 Checking JSON: {file_path} -> {'✅ FOUND' if exists else '❌ MISSING (Serving HTML instead)'}")
+                print(f"[CHECK] Checking JSON: {file_path} -> {'FOUND' if exists else 'MISSING (Serving HTML instead)'}")
 
             # 4. If file exists, serve it
             if os.path.exists(file_path) and os.path.isfile(file_path):
@@ -64,7 +64,7 @@ class SPAHandler(http.server.SimpleHTTPRequestHandler):
             super().do_GET()
 
         except Exception as e:
-            print(f"❌ Server Error: {e}")
+            print(f"[ERROR] Server Error: {e}")
 
     # Standard logging (Fixed the crash)
     def log_message(self, format, *args):
@@ -73,11 +73,11 @@ class SPAHandler(http.server.SimpleHTTPRequestHandler):
                           self.log_date_time_string(),
                           format%args))
 
-print(f"🚀 Server running at http://localhost:{PORT}/")
-print(f"📂 Serving from: {os.path.abspath(DIRECTORY)}")
+print(f"[SERVER] Server running at http://localhost:{PORT}/")
+print(f"[SERVER] Serving from: {os.path.abspath(DIRECTORY)}")
 
 try:
     with ThreadedHTTPServer(("", PORT), SPAHandler) as httpd:
         httpd.serve_forever()
 except KeyboardInterrupt:
-    print("\n🛑 Server stopped.")
+    print("\n[SERVER] Server stopped.")
