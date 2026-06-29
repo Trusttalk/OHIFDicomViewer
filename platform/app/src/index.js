@@ -18,8 +18,11 @@ import '../tailwind.css';
  */
 import { modes as defaultModes, extensions as defaultExtensions } from './pluginImports';
 import loadDynamicConfig from './loadDynamicConfig';
+import { registerCustomIcons } from './utils/overrideIcons';
 export { history } from './utils/history';
 export { preserveQueryParameters, preserveQueryStrings } from './utils/preserveQueryParameters';
+
+registerCustomIcons();
 
 loadDynamicConfig(window.config).then(config_json => {
   // Reset Dynamic config if defined
