@@ -60,6 +60,19 @@ export default async function init({
     peerImport: appConfig.peerImport,
   });
 
+  // [BUGFIX] Polyfill getAllVolumeIds on StackViewport to fix a crash in cornerstone tools' 
+  // playClip / cine playback where it unconditionally calls this method on the viewport.
+  if (cornerstone.StackViewport && !cornerstone.StackViewport.prototype.getAllVolumeIds) {
+    cornerstone.StackViewport.prototype.getAllVolumeIds = function () {
+      return [];
+    };
+  }
+  if (cornerstone.VideoViewport && !cornerstone.VideoViewport.prototype.getAllVolumeIds) {
+    cornerstone.VideoViewport.prototype.getAllVolumeIds = function () {
+      return [];
+    };
+  }
+
   // For debugging e2e tests that are failing on CI
   cornerstone.setUseCPURendering(Boolean(appConfig.useCPURendering));
 
