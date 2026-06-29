@@ -5,6 +5,7 @@ import qs from 'query-string';
 import getImageId from '../DicomWebDataSource/utils/getImageId';
 import getDirectURL from '../utils/getDirectURL';
 import { resolveConfigFetchPolicy, fetchConfigJson } from '../utils/secureConfigFetch';
+import React from 'react';
 
 const metadataProvider = OHIF.classes.MetadataProvider;
 
@@ -61,7 +62,7 @@ const findStudies = (key, value) => {
 };
 
 function createDicomJSONApi(dicomJsonConfig, servicesManager) {
-  const { userAuthenticationService } = servicesManager.services;
+  const { userAuthenticationService, uiModalService } = servicesManager.services;
   const implementation = {
     initialize: async ({ query, url }) => {
       if (!url) {
@@ -82,41 +83,195 @@ function createDicomJSONApi(dicomJsonConfig, servicesManager) {
         });
       }
 
-      const data = await fetchConfigJson(evaluatedUrl);
+      console.log('[DicomJSON] Starting to load DICOM JSON from:', evaluatedUrl.normalizedUrl);
+      console.log('[DicomJSON] uiModalService available:', !!uiModalService);
+
+      // Create a state object to track progress
+      const progressState = {
+        progress: 0,
+        receivedKB: 0,
+        totalKB: 0,
+        status: 'Initializing...',
+      };
+
+      // Show full-screen loading modal
+      let modalId;
+      if (uiModalService) {
+        console.log('[DicomJSON] Showing loading modal');
+        modalId = uiModalService.show({
+          content: () => {
+            return React.createElement(
+              'div',
+              { className: 'flex flex-col items-center justify-center h-full w-full bg-black bg-opacity-90' },
+              React.createElement(
+                'div',
+                { className: 'text-center' },
+                React.createElement(
+                  'div',
+                  { className: 'mb-8' },
+                  React.createElement('div', {
+                    className: 'animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto',
+                  })
+                ),
+                React.createElement('h2', { className: 'text-2xl font-bold text-white mb-4' }, 'Loading DICOM Study'),
+                React.createElement('p', { id: 'dicom-load-status', className: 'text-lg text-gray-300 mb-2' }, progressState.status),
+                React.createElement(
+                  'div',
+                  { className: 'w-96 bg-gray-700 rounded-full h-4 mb-4' },
+                  React.createElement('div', {
+                    id: 'dicom-progress-bar',
+                    className: 'bg-blue-500 h-4 rounded-full transition-all duration-300',
+                    style: { width: `${progressState.progress}%` },
+                  })
+                ),
+                React.createElement('p', { id: 'dicom-progress-text', className: 'text-sm text-gray-400' }, `${progressState.progress}% - ${progressState.receivedKB} KB / ${progressState.totalKB} KB`)
+              )
+            );
+          },
+          customClassName: 'fixed inset-0 z-50',
+          shouldCloseOnEsc: false,
+          shouldCloseOnOverlayClick: false,
+          showOverlay: true,
+          closeButton: false,
+        });
+        console.log('[DicomJSON] Modal ID:', modalId);
+      } else {
+        console.warn('[DicomJSON] uiModalService not available');
+      }
+
+      let data;
+      try {
+        progressState.status = 'Connecting to server...';
+        const response = await fetch(evaluatedUrl.normalizedUrl, {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'include',
+          redirect: 'error',
+          referrerPolicy: 'no-referrer',
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch dynamic datasource configuration (${response.status})`);
+        }
+
+        const reader = response.body?.getReader();
+        const contentLength = +response.headers.get('Content-Length');
+
+        if (!reader) {
+          // Fallback for browsers that don't support streaming
+          progressState.status = 'Downloading study data...';
+          data = await response.json();
+        } else {
+          let receivedLength = 0;
+          const chunks = [];
+          progressState.totalKB = Math.round(contentLength / 1024);
+
+          while (true) {
+            const { done, value } = await reader.read();
+
+            if (done) break;
+
+            chunks.push(value);
+            receivedLength += value.length;
+
+            // Update progress
+            if (contentLength) {
+              progressState.progress = Math.round((receivedLength / contentLength) * 100);
+              progressState.receivedKB = Math.round(receivedLength / 1024);
+              progressState.status = 'Downloading study data...';
+
+              console.log(`[DicomJSON] Progress: ${progressState.progress}%`);
+
+              // Update DOM elements directly
+              const statusEl = document.getElementById('dicom-load-status');
+              const progressBar = document.getElementById('dicom-progress-bar');
+              const progressText = document.getElementById('dicom-progress-text');
+
+              if (statusEl) statusEl.textContent = progressState.status;
+              if (progressBar) progressBar.style.width = `${progressState.progress}%`;
+              if (progressText) {
+                progressText.textContent = `${progressState.progress}% - ${progressState.receivedKB} KB / ${progressState.totalKB} KB`;
+              }
+            }
+          }
+
+          progressState.status = 'Processing study data...';
+          const statusEl = document.getElementById('dicom-load-status');
+          if (statusEl) statusEl.textContent = progressState.status;
+
+          // Combine chunks and parse
+          const chunksAll = new Uint8Array(receivedLength);
+          let position = 0;
+          for (const chunk of chunks) {
+            chunksAll.set(chunk, position);
+            position += chunk.length;
+          }
+
+          const text = new TextDecoder('utf-8').decode(chunksAll);
+          data = JSON.parse(text);
+        }
+      } catch (error) {
+        if (uiModalService) {
+          uiModalService.hide();
+        }
+        console.error('[DicomJSON] Error loading:', error);
+        throw error;
+      }
 
       let StudyInstanceUID;
       let SeriesInstanceUID;
-      data.studies.forEach(study => {
-        StudyInstanceUID = study.StudyInstanceUID;
+      try {
+        progressState.status = 'Processing study metadata...';
+        const statusEl = document.getElementById('dicom-load-status');
+        if (statusEl) statusEl.textContent = progressState.status;
 
-        study.series.forEach(series => {
-          SeriesInstanceUID = series.SeriesInstanceUID;
+        data.studies.forEach(study => {
+          StudyInstanceUID = study.StudyInstanceUID;
 
-          series.instances.forEach(instance => {
-            const { metadata: naturalizedDicom } = instance;
-            const imageId = getImageId({ instance, config: dicomJsonConfig });
+          study.series.forEach(series => {
+            SeriesInstanceUID = series.SeriesInstanceUID;
 
-            const { query } = qs.parseUrl(instance.url);
+            series.instances.forEach(instance => {
+              const { metadata: naturalizedDicom } = instance;
+              const imageId = getImageId({ instance, config: dicomJsonConfig });
 
-            // Add imageId specific mapping to this data as the URL isn't necessarily WADO-URI.
-            metadataProvider.addImageIdToUIDs(imageId, {
-              StudyInstanceUID,
-              SeriesInstanceUID,
-              SOPInstanceUID: naturalizedDicom.SOPInstanceUID,
-              frameNumber: query.frame ? parseInt(query.frame) : undefined,
+              const { query } = qs.parseUrl(instance.url);
+
+              // Add imageId specific mapping to this data as the URL isn't necessarily WADO-URI.
+              metadataProvider.addImageIdToUIDs(imageId, {
+                StudyInstanceUID,
+                SeriesInstanceUID,
+                SOPInstanceUID: naturalizedDicom.SOPInstanceUID,
+                frameNumber: query.frame ? parseInt(query.frame) : undefined,
+              });
             });
           });
         });
-      });
 
-      _store.urls.push({
-        url: evaluatedUrl.normalizedUrl,
-        studies: [...data.studies],
-      });
-      _store.studyInstanceUIDMap.set(
-        evaluatedUrl.normalizedUrl,
-        data.studies.map(study => study.StudyInstanceUID)
-      );
+        _store.urls.push({
+          url: evaluatedUrl.normalizedUrl,
+          studies: [...data.studies],
+        });
+        _store.studyInstanceUIDMap.set(
+          evaluatedUrl.normalizedUrl,
+          data.studies.map(study => study.StudyInstanceUID)
+        );
+      } finally {
+        // Hide modal after all processing is complete
+        if (uiModalService) {
+          console.log('[DicomJSON] Hiding modal - processing complete');
+          setTimeout(() => {
+            try {
+              uiModalService.hide();
+              console.log('[DicomJSON] Modal hide called successfully');
+            } catch (e) {
+              console.error('[DicomJSON] Error hiding modal:', e);
+            }
+          }, 100);
+        } else {
+          console.warn('[DicomJSON] Cannot hide modal - service not available');
+        }
+      }
     },
     query: {
       studies: {
@@ -234,11 +389,11 @@ function createDicomJSONApi(dicomJsonConfig, servicesManager) {
               const modifiedMetadata = wrapSequences(instance.metadata);
 
               const obj = {
+                ...series,
+                ...study,
                 ...modifiedMetadata,
                 url: instance.url,
                 imageId: getImageId({ instance, config: dicomJsonConfig }),
-                ...series,
-                ...study,
               };
               delete obj.instances;
               delete obj.series;

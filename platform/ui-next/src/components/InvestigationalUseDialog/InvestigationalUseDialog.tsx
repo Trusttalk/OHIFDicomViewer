@@ -70,22 +70,22 @@ const InvestigationalUseDialog = ({
           <Icons.InvestigationalUse className="h-18 w-18" />
           <div className="flex flex-col">
             <div className="text-[19px] text-white">
-              OHIF Viewer is{' '}
+              TrustTalk Viewer is{' '}
               <span className="text-primary-light">{t('for investigational use only')}</span>
             </div>
             <div className="text-[13px] text-white">
               <span
-                className="text-primary-active cursor-pointer"
-                onClick={() => window.open('https://ohif.org/', '_blank')}
+                className="text-primary cursor-pointer"
+                onClick={() => window.open('https://trusttalk.net/', '_blank')}
               >
-                {t('Learn more about OHIF Viewer')}
+                {t('Learn more about TrustTalk Viewer')}
               </span>
             </div>
           </div>
         </div>
         <Button
           onClick={handleConfirmAndHide}
-          className="bg-primary-main"
+          className="bg-primary"
           dataCY="confirm-and-hide-button"
         >
           {t('Confirm and hide')}

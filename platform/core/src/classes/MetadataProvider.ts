@@ -16,6 +16,14 @@ class MetadataProvider {
   // as type "scalingModule"
   private readonly customMetadata: Map<string, any> = new Map();
 
+  private getURI(imageId: string): string {
+    const urlRegex = /^(http|https|dicomfile):\/\//;
+    if (urlRegex.test(imageId)) {
+      return imageId;
+    }
+    return imageIdToURI(imageId);
+  }
+
   addImageIdToUIDs(imageId, uids) {
     if (!imageId) {
       throw new Error('MetadataProvider::Empty imageId');
@@ -24,12 +32,12 @@ class MetadataProvider {
     // This method is a fallback for when you don't have WADO-URI or WADO-RS.
     // You can add instances fetched by any method by calling addInstance, and hook an imageId to point at it here.
     // An example would be dicom hosted at some random site.
-    const imageURI = imageIdToURI(imageId);
+    const imageURI = this.getURI(imageId);
     this.imageURIToUIDs.set(imageURI, uids);
   }
 
   addCustomMetadata(imageId, type, metadata) {
-    const imageURI = imageIdToURI(imageId);
+    const imageURI = this.getURI(imageId);
     if (!this.customMetadata.has(type)) {
       this.customMetadata.set(type, {});
     }
@@ -76,7 +84,7 @@ class MetadataProvider {
     // check inside custom metadata
     if (this.customMetadata.has(query)) {
       const customMetadata = this.customMetadata.get(query);
-      const imageURI = imageIdToURI(imageId);
+      const imageURI = this.getURI(imageId);
       if (customMetadata[imageURI]) {
         return customMetadata[imageURI];
       }
@@ -474,15 +482,8 @@ class MetadataProvider {
     }
 
     // Maybe its a non-standard imageId
-    // check if the imageId starts with http:// or https:// using regex
     // Todo: handle non http imageIds
-    let imageURI;
-    const urlRegex = /^(http|https|dicomfile):\/\//;
-    if (urlRegex.test(imageId)) {
-      imageURI = imageId;
-    } else {
-      imageURI = imageIdToURI(imageId);
-    }
+    let imageURI = this.getURI(imageId);
 
     // remove &frame=number from imageId
     imageURI = imageURI.split('&frame=')[0];

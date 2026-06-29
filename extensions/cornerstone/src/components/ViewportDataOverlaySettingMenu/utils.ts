@@ -60,8 +60,13 @@ export function getEnhancedDisplaySets({ viewportId, services }) {
     displaySetService.getDisplaySetByUID(displaySetUID)
   );
 
-  const backgroundCanBeVolume = csUtils.isValidVolume(viewportDisplaySets[0].imageIds || []);
   const backgroundDisplaySet = viewportDisplaySets[0];
+  let backgroundCanBeVolume = false;
+  try {
+    backgroundCanBeVolume = csUtils.isValidVolume(backgroundDisplaySet?.imageIds || []);
+  } catch (e) {
+    // metadata not yet registered for imageIds
+  }
 
   const enhancedDisplaySets = otherDisplaySets.map(displaySet => {
     if (!backgroundDisplaySet.isReconstructable) {
@@ -101,7 +106,13 @@ export function getEnhancedDisplaySets({ viewportId, services }) {
       const imageIds = displaySet.imageIds || displaySet.images?.map(image => image.imageId);
       const isMultiframe = displaySet.isMultiFrame;
 
-      if (!isMultiframe && imageIds?.length > 0 && !csUtils.isValidVolume(imageIds)) {
+      let isValidVol = false;
+      try {
+        isValidVol = csUtils.isValidVolume(imageIds);
+      } catch (e) {
+        // metadata not yet registered for imageIds
+      }
+      if (!isMultiframe && imageIds?.length > 0 && !isValidVol) {
         return {
           ...displaySet,
           isOverlayable: false,

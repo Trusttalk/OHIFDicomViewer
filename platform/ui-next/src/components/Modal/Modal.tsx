@@ -30,10 +30,12 @@ const Modal: React.FC<ModalProps> = ({
       shouldCloseOnOverlayClick={shouldCloseOnOverlayClick}
     >
       <DialogContent className={containerClassName}>
-        {title && (
+        {title ? (
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
           </DialogHeader>
+        ) : (
+          <DialogTitle className="sr-only">Dialog</DialogTitle>
         )}
         <div className={cn('mt-2')}>{children}</div>
       </DialogContent>

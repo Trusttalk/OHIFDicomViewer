@@ -1,7 +1,7 @@
 {
-  "name": "OHIF Viewer",
+  "name": "TrustTalk Viewer",
   "short_name": "Viewer",
-  "description": "OHIF Viewer",
+  "description": "TrustTalk Viewer",
   "dir": "auto",
   "lang": "en-US",
   "orientation": "any",
