@@ -127,8 +127,12 @@ if ($upload) {
         Write-Error "Build directory does not exist at $distPath. Please run build first."
     }
 
+    # DESIGN CHOICE: We use 'npx wrangler' here dynamically to deploy the builds.
+    # While installing wrangler as a local devDependency (yarn add --dev wrangler) would make execution 
+    # slightly faster, we explicitly chose to keep wrangler out of the package.json to avoid bloating 
+    # node_modules and let npx handle package caching automatically.
     Write-Host "[DEPLOY] Uploading platform/app/dist to Cloudflare Pages..." -ForegroundColor Yellow
-    npx wrangler pages deploy "$distPath" --project-name viewer-dwp --branch main
+    npx wrangler pages deploy "$distPath" --project-name viewer --branch main
     
     Write-Host "[DEPLOY] Upload Completed successfully." -ForegroundColor Green
 }
