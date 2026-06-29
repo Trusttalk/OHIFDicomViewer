@@ -32,9 +32,13 @@ class MetadataProvider {
     // This method is a fallback for when you don't have WADO-URI or WADO-RS.
     // You can add instances fetched by any method by calling addInstance, and hook an imageId to point at it here.
     // An example would be dicom hosted at some random site.
-    const imageURI = this.getURI(imageId);
+    let imageURI = this.getURI(imageId);
+    // Strip &frame=N so the key matches what getUIDsFromImageID looks up.
+    // The lookup always strips the frame, so we must store without it too.
+    imageURI = imageURI.split('&frame=')[0];
     this.imageURIToUIDs.set(imageURI, uids);
   }
+
 
   addCustomMetadata(imageId, type, metadata) {
     const imageURI = this.getURI(imageId);
@@ -68,7 +72,14 @@ class MetadataProvider {
       return;
     }
 
-    return (frameNumber && combineFrameInstance(frameNumber, instance)) || instance;
+    const result = (frameNumber && combineFrameInstance(frameNumber, instance)) || instance;
+    if (result) {
+      // Return a shallow copy so we don't mutate the shared cached instance object.
+      // Mutating result.imageId directly caused getImageId() (which checks instance.imageId first)
+      // to return a corrupted imageId, breaking addImageIdToUIDs map lookups for subsequent calls.
+      return { ...result, imageId };
+    }
+    return result;
   }
 
   get(query, imageId, options = { fallback: false }) {
@@ -595,14 +606,19 @@ const WADO_IMAGE_LOADER = {
       rowCosines = [1, 0, 0];
       columnCosines = [0, 1, 0];
       imageOrientationPatient = [1, 0, 0, 0, 1, 0];
-      usingDefaultValues = true;
       isDefaultValueSetForRowCosine = true;
       isDefaultValueSetForColumnCosine = true;
+      // We do NOT set usingDefaultValues = true here.
+      // In projection radiography (DX, CR, PX, etc.), ImageOrientationPatient is optional.
+      // If PixelSpacing is present, we still want to use it for measurement calibration
+      // instead of invalidating it and defaulting to px.
     }
 
     const imagePositionPatient = toNumber(ImagePositionPatient) || [0, 0, 0];
     if (!ImagePositionPatient) {
-      usingDefaultValues = true;
+      // We do NOT set usingDefaultValues = true here.
+      // In projection radiography, ImagePositionPatient is optional.
+      // Having no position should not invalidate the spacing measurement unit (mm).
     }
 
     return {
