@@ -12,7 +12,12 @@ window.config = {
   ],
 
   // 3. Modes
-  modes: ['@ohif/mode-longitudinal'],
+  modes: [
+    '@ohif/mode-longitudinal',
+    '@ohif/mode-basic',
+    '@ohif/mode-segmentation',
+    '@ohif/mode-tmtv',
+  ],
 
   // 4. Data Source: JSON File (Serverless)
   dataSources: [
@@ -27,6 +32,8 @@ window.config = {
           'http://localhost:3000',
           'http://localhost:5173',
           'http://localhost:5000',
+          'https://staging-storeapi.trusttalk.net',
+          'https://storeapi.trusttalk.net',
         ],
       },
     },
