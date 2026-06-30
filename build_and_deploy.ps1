@@ -3,7 +3,8 @@ param (
     [switch]$sync,
     [switch]$upload,
     [switch]$testData,
-    [switch]$runLocal
+    [switch]$runLocal,
+    [switch]$runProd
 )
 
 $ErrorActionPreference = "Stop"
@@ -62,7 +63,7 @@ if ($testData) {
 }
 
 # 3. Build Project (Development by default, Production via -prod)
-$skipBuild = $sync -or $testData -or $runLocal -or $upload
+$skipBuild = $sync -or $testData -or $runLocal -or $runProd -or $upload
 if ($prod -or -not $skipBuild) {
     Write-Host "[BUILD] Starting Build..." -ForegroundColor Cyan
     Write-Host "[BUILD] Installing dependencies..." -ForegroundColor Yellow
@@ -79,9 +80,10 @@ if ($prod -or -not $skipBuild) {
 }
 
 # 4. Local CORS Testing Server Setup & Run
-if ($runLocal) {
+if ($runLocal -or $runProd) {
     Write-Host "[LOCAL] Launching Local Python CORS Server..." -ForegroundColor Cyan
-    $distPath = Join-Path $rootFolder "platform\app\dist"
+    $distFolderName = if ($prod -or $runProd) { "dist" } else { "dist-dev" }
+    $distPath = Join-Path $rootFolder "platform\app\$distFolderName"
     $dvPath = Join-Path $rootFolder "platform\app\dv"
     $distDvPath = Join-Path $distPath "dv"
 
@@ -109,8 +111,8 @@ if ($runLocal) {
         New-Item -ItemType Junction -Path $distDvPath -Value $dvPath
     }
 
-    Write-Host "[LOCAL] Starting Python HTTP Server in platform/app/dist..." -ForegroundColor Yellow
-    Push-Location (Join-Path $rootFolder "platform\app\dist")
+    Write-Host "[LOCAL] Starting Python HTTP Server in platform/app/$distFolderName..." -ForegroundColor Yellow
+    Push-Location $distPath
     try {
         python ../server.py
     } finally {

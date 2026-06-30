@@ -12,7 +12,8 @@ const { InjectManifest } = require('workbox-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 // ~~ Directories
 const SRC_DIR = path.join(__dirname, '../src');
-const DIST_DIR = path.join(__dirname, '../dist');
+const isProd = process.env.NODE_ENV === 'production';
+const DIST_DIR = isProd ? path.join(__dirname, '../dist') : path.join(__dirname, '../dist-dev');
 const PUBLIC_DIR = path.join(__dirname, '../public');
 // ~~ Env Vars
 const HTML_TEMPLATE = process.env.HTML_TEMPLATE || 'index.html';
