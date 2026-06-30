@@ -1,5 +1,5 @@
 import { ShepherdBase } from 'shepherd.js';
-import { offset, flip, shift, detectOverflow } from '@floating-ui/dom';
+import { offset, flip, shift } from '@floating-ui/dom';
 
 /**
  * Retrieves the list of tours that have been shown from localStorage.
@@ -52,40 +52,18 @@ const defaultShowHandler = (Shepherd: ShepherdBase) => {
 };
 
 /**
- * Custom middleware for adjusting Shepherd step positioning when overflowing.
- *
- * @type {object}
- * @property {string} name - The name of the middleware.
- * @property {function} fn - The function that adjusts the position of the step when overflowing.
- */
-
-const customMiddleware = {
-  name: 'customOverflowMiddleware',
-  async fn(state) {
-    const overflow = await detectOverflow(state, {
-      boundary: document.querySelector('body'),
-      padding: 24,
-    });
-
-    const xAdjustment =
-      overflow.left > 0 ? overflow.left : overflow.right > 0 ? -overflow.right : 0;
-    const yAdjustment =
-      overflow.top > 0 ? overflow.top : overflow.bottom > 0 ? -overflow.bottom : 0;
-
-    return {
-      x: state.x + xAdjustment,
-      y: state.y + yAdjustment,
-    };
-  },
-};
-
-/**
  * Default Floating UI middleware for positioning steps in Shepherd.js.
- * Includes offset, shift, flip, and custom overflow middleware.
+ * Includes offset, shift (with body-boundary padding), and flip.
+ *
+ * Note: A previous `customMiddleware` that called `detectOverflow` from `@floating-ui/dom`
+ * was removed because Shepherd.js provides its own platform object that does not implement
+ * the `platform.detectOverflow` interface expected by `@floating-ui/dom`. This caused a
+ * TypeError in production builds. The same boundary-nudging behaviour is covered natively
+ * by `shift({ padding: 24 })`.
  *
  * @type {Array<object>}
  */
 
-const middleware = [offset(15), shift(), flip(), customMiddleware];
+const middleware = [offset(15), shift({ padding: 24 }), flip()];
 
 export { hasTourBeenShown, markTourAsShown, middleware, defaultShowHandler };

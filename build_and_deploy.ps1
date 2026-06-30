@@ -70,7 +70,7 @@ if ($prod -or -not $skipBuild) {
 
     if ($prod) {
         Write-Host "[BUILD] Building PRODUCTION build..." -ForegroundColor Yellow
-        yarn --cwd platform/app run build
+        yarn --cwd platform/app run build:viewer
     } else {
         Write-Host "[BUILD] Building DEVELOPMENT build..." -ForegroundColor Yellow
         yarn --cwd platform/app run build:dev
