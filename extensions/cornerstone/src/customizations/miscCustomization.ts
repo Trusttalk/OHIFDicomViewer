@@ -9,7 +9,7 @@ const DicomUploadWithSize = Object.assign(DicomUpload, {
 
 export default {
   cinePlayer: CinePlayer,
-  autoCineModalities: ['OT', 'US'],
+  autoCineModalities: ['OT', 'US', 'XA'],
   'panelMeasurement.disableEditing': false,
   onBeforeSRAddMeasurement: ({ measurement, StudyInstanceUID, SeriesInstanceUID }) => {
     return measurement;

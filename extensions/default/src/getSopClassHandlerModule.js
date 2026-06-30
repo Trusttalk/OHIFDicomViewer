@@ -102,7 +102,7 @@ const makeDisplaySet = (instances, index) => {
     SeriesInstanceUID: instance.SeriesInstanceUID,
     StudyInstanceUID: instance.StudyInstanceUID,
     SeriesNumber: instance.SeriesNumber || 0,
-    FrameRate: instance.FrameTime,
+    FrameRate: instance.FrameTime || (instance.CineRate ? 1000 / instance.CineRate : undefined) || (instance.RecommendedDisplayFrameRate ? 1000 / instance.RecommendedDisplayFrameRate : undefined),
     SOPClassUID: instance.SOPClassUID,
     SeriesDescription: instance.SeriesDescription || '',
     Modality: instance.Modality,
