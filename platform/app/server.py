@@ -7,7 +7,7 @@ import sys
 # --------------------------
 # CONFIGURATION
 # --------------------------
-PORT = 5173
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 5173
 DIRECTORY = "." # Current directory (platform/app)
 
 class ThreadedHTTPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):

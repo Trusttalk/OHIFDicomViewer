@@ -1,25 +1,53 @@
 window.config = {
   // 1. Core Deployment Settings
   routerBasename: '/',
-  showStudyList: false, // We launch directly via URL, so no study list needed.
+  showStudyList: false, // Launched directly via URL; no worklist needed.
+  maxNumberOfWebWorkers: 4,
+  strictZSpacingForVolumeViewport: true,
+  showLoadingIndicator: true,
+  showWarningMessageForCrossOrigin: true,
+  showCPUFallbackMessage: true,
 
-  // 2. Extensions
+  // 2. Request Throttling & Pre-fetching
+  maxNumRequests: {
+    interaction: 100,
+    thumbnail: 75,
+    prefetch: 25,
+  },
+  studyPrefetcher: {
+    enabled: true,
+    displaySetsCount: 2,
+    maxNumPrefetchRequests: 10,
+    order: 'closest',
+  },
+  httpErrorHandler: error => {
+    console.warn('HTTP error handled by TrustTalk error handler:', error);
+  },
+
+  // 3. Extensions (Full Diagnostic & Advanced Modalities Suite)
   extensions: [
+    '@ohif/extension-default',
+    '@ohif/extension-cornerstone',
     '@ohif/extension-measurement-tracking',
     '@ohif/extension-cornerstone-dicom-sr',
+    '@ohif/extension-cornerstone-dicom-seg',
+    '@ohif/extension-cornerstone-dicom-rt',
+    '@ohif/extension-cornerstone-dicom-pmap',
+    '@ohif/extension-tmtv',
     '@ohif/extension-dicom-pdf',
     '@ohif/extension-dicom-video',
   ],
 
-  // 3. Modes
+  // 4. Modes (Workspaces)
   modes: [
     '@ohif/mode-longitudinal',
     '@ohif/mode-basic',
     '@ohif/mode-segmentation',
     '@ohif/mode-tmtv',
+    '@ohif/mode-microscopy',
   ],
 
-  // 4. Data Source: JSON File (Serverless)
+  // 5. Data Source: JSON File (Serverless Presigned Manifest)
   dataSources: [
     {
       namespace: '@ohif/extension-default.dataSourcesModule.dicomjson',
@@ -27,7 +55,6 @@ window.config = {
       configuration: {
         friendlyName: 'JSON File Source',
         name: 'json',
-        // Security controls for runtime ?url=... datasource loading in authenticated environments
         dangerouslyAllowedOriginsForAuthenticatedEnvironments: [
           'http://localhost:3000',
           'http://localhost:5173',
@@ -38,11 +65,9 @@ window.config = {
       },
     },
   ],
-
-  // This tells TTDV to use the 'dicomjson' source by default
   defaultDataSourceName: 'dicomjson',
 
-  // 5. TrustTalk Custom Branding
+  // 6. TrustTalk Custom Branding
   whiteLabeling: {
     createLogoComponentFn: function (React) {
       return React.createElement(
@@ -59,7 +84,6 @@ window.config = {
           },
         },
         [
-          // Logo image
           React.createElement('img', {
             key: 'logo-img',
             src: '/trusttalk-logo.png',
@@ -72,14 +96,13 @@ window.config = {
               e.target.style.display = 'none';
             },
           }),
-          // Company name text
           React.createElement('span', { key: 'logo-text' }, 'TrustTalk'),
         ]
       );
     },
   },
 
-  // 6. Custom Hotkeys
+  // 7. Custom Hotkeys
   hotkeys: [
     { commandName: 'incrementActiveViewport', label: 'Next Viewport', keys: ['right'] },
     { commandName: 'decrementActiveViewport', label: 'Previous Viewport', keys: ['left'] },
@@ -93,28 +116,81 @@ window.config = {
     { commandName: 'resetViewport', label: 'Reset', keys: ['space'] },
   ],
 
-  // 7. UI Customization (Overlays)
+  // 8. Viewport Overlays (Standard Diagnostic 4-Corner Setup)
   customizationService: {
-    cornerstoneOverlayTopLeft: {
-      id: 'cornerstoneOverlayTopLeft',
-      items: [
-        {
-          id: 'PatientNameOverlay',
-          customizationType: 'ohif.overlayItem',
-          attribute: 'PatientName',
-          title: 'Patient Name',
-          condition: ({ instance }) => instance?.PatientName,
-          contentF: ({ instance, formatters: { formatPN } }) => formatPN(instance.PatientName),
+    'viewportOverlay.topLeft': [
+      {
+        id: 'PatientName',
+        inheritsFrom: 'ohif.overlayItem',
+        condition: ({ referenceInstance }) => referenceInstance?.PatientName,
+        contentF: ({ referenceInstance, formatters: { formatPN } }) =>
+          formatPN(referenceInstance.PatientName),
+      },
+      {
+        id: 'PatientID',
+        inheritsFrom: 'ohif.overlayItem',
+        condition: ({ referenceInstance }) => referenceInstance?.PatientID,
+        contentF: ({ referenceInstance }) => referenceInstance.PatientID,
+      },
+      {
+        id: 'StudyDate',
+        inheritsFrom: 'ohif.overlayItem',
+        condition: ({ referenceInstance }) => referenceInstance?.StudyDate,
+        contentF: ({ referenceInstance, formatters: { formatDate } }) =>
+          formatDate(referenceInstance.StudyDate),
+      },
+      {
+        id: 'SeriesDescription',
+        inheritsFrom: 'ohif.overlayItem',
+        condition: ({ referenceInstance }) => referenceInstance?.SeriesDescription,
+        contentF: ({ referenceInstance }) => referenceInstance.SeriesDescription,
+      },
+    ],
+    'viewportOverlay.topRight': [
+      {
+        id: 'StudyDescription',
+        inheritsFrom: 'ohif.overlayItem',
+        condition: ({ referenceInstance }) => referenceInstance?.StudyDescription,
+        contentF: ({ referenceInstance }) => referenceInstance.StudyDescription,
+      },
+      {
+        id: 'Modality',
+        inheritsFrom: 'ohif.overlayItem',
+        condition: ({ referenceInstance }) => referenceInstance?.Modality,
+        contentF: ({ referenceInstance }) => referenceInstance.Modality,
+      },
+    ],
+    'viewportOverlay.bottomLeft': [
+      {
+        id: 'WindowLevel',
+        inheritsFrom: 'ohif.overlayItem.windowLevel',
+      },
+      {
+        id: 'ZoomLevel',
+        inheritsFrom: 'ohif.overlayItem.zoomLevel',
+      },
+    ],
+    'viewportOverlay.bottomRight': [
+      {
+        id: 'InstanceNumber',
+        inheritsFrom: 'ohif.overlayItem.instanceNumber',
+      },
+      {
+        id: 'ThicknessLocation',
+        inheritsFrom: 'ohif.overlayItem',
+        condition: ({ referenceInstance }) =>
+          referenceInstance?.SliceThickness || referenceInstance?.SliceLocation,
+        contentF: ({ referenceInstance, formatters: { formatNumberPrecision } }) => {
+          const parts = [];
+          if (referenceInstance?.SliceThickness) {
+            parts.push(`Thick: ${formatNumberPrecision(referenceInstance.SliceThickness, 2)}mm`);
+          }
+          if (referenceInstance?.SliceLocation) {
+            parts.push(`Loc: ${formatNumberPrecision(referenceInstance.SliceLocation, 2)}mm`);
+          }
+          return parts.join(' | ');
         },
-        {
-          id: 'PatientIDOverlay',
-          customizationType: 'ohif.overlayItem',
-          attribute: 'PatientID',
-          title: 'Patient ID',
-          condition: ({ instance }) => instance?.PatientID,
-          contentF: ({ instance }) => instance.PatientID,
-        },
-      ],
-    },
+      },
+    ],
   },
 };
